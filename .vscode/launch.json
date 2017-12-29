@@ -1,0 +1,39 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach (Remote Debug)",
+            "type": "python",
+            "request": "attach",
+            "localRoot": "${workspaceFolder}/api_python",
+            "remoteRoot": "/opt/fly-inpect/api",
+            "port": 3500,
+            "secret": "my_secret",
+            "host": "localhost"
+        },
+        // {
+        //     "name": "Python: Django",
+        //     "type": "python",
+        //     "request": "launch",
+        //     "pythonPath": "${config:python.pythonPath}",
+        //     "program": "${workspaceRoot}/api_python/manage.py",
+        //     "cwd": "${workspaceRoot}/api_python",
+        //     "args": [
+        //         "runserver",
+        //         "--noreload",
+        //         "--nothreading"
+        //     ],
+        //     // "env": {},
+        //     "envFile": "${workspaceRoot}/api_python/.env",
+        //     "debugOptions": [
+        //         "WaitOnAbnormalExit",
+        //         "WaitOnNormalExit",
+        //         "RedirectOutput",
+        //         "DjangoDebugging"
+        //     ]
+        // }
+    ]
+}
