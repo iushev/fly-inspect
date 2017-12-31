@@ -42,6 +42,7 @@ class InfiniteScrollTable extends Component {
         this.setState({
             resizing: {
                 columnKey: columnKey,
+                width: this.getColumnWidth(columnKey),
                 startX: this.getPointerX(event),
             }
         });
@@ -59,10 +60,12 @@ class InfiniteScrollTable extends Component {
         event.stopPropagation();
 
         let pageX = this.getPointerX(event);
-        const { resizing, resized } = this.state;
-        let currWidth = resized[resizing.columnKey] || this.props.columns[resizing.columnKey].width || 100;
+        const {
+            resizing,
+         } = this.state;
+
         const newWidth = Math.max(
-            (currWidth + pageX - resizing.startX),
+            (resizing.width + pageX - resizing.startX),
             11,
         );
 
@@ -70,10 +73,7 @@ class InfiniteScrollTable extends Component {
             resizing: {
                 ...resizing,
                 startX: pageX,
-            },
-            resized: {
-                ...resized,
-                [resizing.columnKey]: newWidth,
+                width: newWidth,
             },
         });
     }
@@ -91,6 +91,10 @@ class InfiniteScrollTable extends Component {
 
         this.setState({
             resizing: false,
+            resized: {
+                ...this.state.resized,
+                [this.state.resizing.columnKey]: this.state.resizing.width,
+            },
         });
     }
 
@@ -101,39 +105,61 @@ class InfiniteScrollTable extends Component {
         return event.pageX;
     }
 
-    renderHeader() {
+    getColumnWidth = (columnKey) => {
+        return this.state.resized[columnKey] || this.props.columns[columnKey].width || 100;
+    }
+
+    renderHeader(minWidth) {
         return (
-            <div className={style.header}>
-                { Object.keys(this.props.columns).map((columnKey) => {
-                    const column = this.props.columns[columnKey];
-                    return (
-                        <div
-                            key={columnKey}
-                            className={style.headerCell}
-                            style={{
-                                ...column.headerStyle || {},
-                                width: this.state.resized[columnKey] || column.width || '100px',
-                                maxWidth: this.state.resized[columnKey] || column.width || '100px',
-                            }}
-                        >
+            <div
+                className={style.header}
+                style={{
+                    overflow: 'hidden',
+                }}
+                ref={(header) => { this.header = header; }}
+            >
+                <div
+                    style={{
+                        minWidth: minWidth,
+                    }}
+                >
+                    { Object.keys(this.props.columns).map((columnKey) => {
+                        const column = this.props.columns[columnKey];
+                        let width = this.getColumnWidth(columnKey);
+                        let resizerClasses = [style.resizer];
+                        if (this.state.resizing && this.state.resizing.columnKey === columnKey) {
+                            resizerClasses.push(style.resizing);
+                            width = this.state.resizing.width;
+                        }
+                        return (
                             <div
-                                className={style.headerContent}
+                                key={columnKey}
+                                className={style.headerCell}
+                                style={{
+                                    ...column.headerStyle || {},
+                                    width: width,
+                                    maxWidth: width,
+                                }}
                             >
-                                { column.header || columnKey }
+                                <div
+                                    className={style.headerContent}
+                                >
+                                    { column.header || columnKey }
+                                </div>
+                                <div
+                                    className={resizerClasses.join(' ')}
+                                    onMouseDown={(event) => this.columnResizingStart(event, columnKey)}
+                                    onTouchStart={(event) => this.columnResizingStart(event, columnKey)}
+                                />
                             </div>
-                            <div
-                                className={style.resizer}
-                                onMouseDown={(event) => this.columnResizingStart(event, columnKey)}
-                                onTouchStart={(event) => this.columnResizingStart(event, columnKey)}
-                            />
-                        </div>
-                    );
-                }) }
+                        );
+                    }) }
+                </div>
             </div>
         );
     }
 
-    renderBody() {
+    renderBody(minWidth) {
         let rows = null;
         if (this.props.data) {
             rows = this.props.data.map((row) => (
@@ -141,18 +167,20 @@ class InfiniteScrollTable extends Component {
                     key={row.id}
                     className={style.row}
                     style={{
+                        minWidth: minWidth,
                     }}
                 >
                     { Object.keys(this.props.columns).map((columnKey) => {
                         const column = this.props.columns[columnKey];
+                        const width = this.getColumnWidth(columnKey);
                         return (
                             <div
                                 key={columnKey}
                                 className={style.bodyCell}
                                 style={{
                                     ...column.style || {},
-                                    width: this.state.resized[columnKey] || column.width || '100px',
-                                    maxWidth: this.state.resized[columnKey] || column.width || '100px',
+                                    width: width,
+                                    maxWidth: width,
                                 }}
                             >
                                 {row[column.field]}
@@ -163,17 +191,7 @@ class InfiniteScrollTable extends Component {
             ));
         }
 
-        return (
-            <InfiniteScroll
-                className={style.body}
-                style={{
-                }}
-                hasMore={this.props.hasMore}
-                loadMore={() => this.props.loadMore()}
-            >
-                { rows }
-            </InfiniteScroll>
-        );
+        return rows;
     }
 
     renderFooter() {
@@ -185,7 +203,30 @@ class InfiniteScrollTable extends Component {
         );
     }
 
+    scrollHeader = (event) => {
+        if (!this.header) {
+            return;
+        }
+        let scrollLeft = event.target.scrollLeft || document.body.scrollLeft;
+        this.header.scrollLeft = scrollLeft;
+    }
+
     render() {
+        const minWidthHeader = Object.keys(this.props.columns).reduce((width, columnKey) => {
+            if (this.state.resizing && this.state.resizing.columnKey === columnKey) {
+                width += this.state.resizing.width;
+            }
+            else {
+                width += this.getColumnWidth(columnKey);
+            }
+            return width;
+        }, 0);
+
+        const minWidthBody = Object.keys(this.props.columns).reduce((width, columnKey) => {
+            width += this.getColumnWidth(columnKey);
+            return width;
+        }, 0);
+
         return (
             <div
                 className={style.InfiniteScrollTable}
@@ -193,8 +234,15 @@ class InfiniteScrollTable extends Component {
                     height: 500,
                 }}
             >
-                { this.renderHeader() }
-                { this.renderBody() }
+                { this.renderHeader(minWidthHeader) }
+                <InfiniteScroll
+                    className={style.body}
+                    hasMore={this.props.hasMore}
+                    loadMore={this.props.loadMore}
+                    onScroll={this.scrollHeader}
+                >
+                    { this.renderBody(minWidthBody) }
+                </InfiniteScroll>
             </div>
         );
     }

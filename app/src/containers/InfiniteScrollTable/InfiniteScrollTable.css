@@ -7,8 +7,9 @@
 .InfiniteScrollTable {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    /* width: 100%; */
     overflow: hidden;
+    position: relative;
     /* align-items: stretch; */
     /* border-collapse: collapse; */
 }
@@ -19,6 +20,12 @@
 }
 
 .InfiniteScrollTable .header {
+    /* position: absolute; */
+    /* top: 0; */
+    /* right: 0; */
+    /* left: 0; */
+    /* height: 30px; */
+    /* background-color: #ffffff; */
     flex: 0 0 auto;
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
     user-select: none;
@@ -26,8 +33,12 @@
 
 .InfiniteScrollTable .body {
     flex: 1 1 auto;
+    /* position: absolute; */
+    /* top: 30px; */
+    /* right: 0; */
+    /* bottom: 0; */
+    /* left: 0; */
 }
-
 
 .InfiniteScrollTable .headerCell,
 .InfiniteScrollTable .bodyCell {
@@ -54,4 +65,12 @@
     bottom: 0;
     cursor: col-resize;
     z-index: 10;
+}
+
+
+.InfiniteScrollTable .resizer.resizing {
+    padding-left: 16px;
+    padding-right: 16px;
+    background-clip: content-box;
+    background-color: #4285F4;
 }

@@ -42,6 +42,7 @@ class WorkOrders extends Component {
                         description: {
                             header: 'Description',
                             field: 'fld_description',
+                            width: 300,
                         },
                     }}
                     data={this.props.workOrders}

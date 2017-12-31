@@ -10,13 +10,15 @@ class InfiniteScroll extends Component {
         loadMore: PropTypes.func,
         hasMore: PropTypes.bool,
         ref: PropTypes.func,
-        threshold: PropTypes.number
+        threshold: PropTypes.number,
+        onScroll: PropTypes.func,
     };
 
     static defaultProps = {
         hasMore: false,
         ref: null,
         threshold: 250,
+        onScroll: (scroll) => ({}),
     };
 
     hasMore = true;
@@ -55,9 +57,15 @@ class InfiniteScroll extends Component {
     }
 
     scrollHandler = (event) => {
+        // this.props.onScroll({
+        //     scrollTop,
+        //     scrollLeft,
+        // });
+
         if (!this.props.hasMore) {
             return;
         }
+
         let scrollTop = event.target.scrollTop || document.body.scrollTop;
         let scrollHeight = event.target.scrollHeight || document.body.scrollHeight;
         let clientHeight = event.target.clientHeight || window.innerHeight;
@@ -89,7 +97,6 @@ class InfiniteScroll extends Component {
                 }}
                 style = {{
                     overflow: 'auto',
-                    WebkitOverflowScrolling: 'touch',
                     ...style,
                 }} {...props}>
                 {children}
