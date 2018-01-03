@@ -30,7 +30,6 @@ export const fetchWorkOrders = (params = {}) => {
                 return response;
             })
             .catch((err) => {
-                console.log(err);
                 dispatch(fetchingWorkOrdersError(err.message));
                 return err;
             });

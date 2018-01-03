@@ -1,67 +1,71 @@
 import React, { Component } from 'react';
-import Griddle, { plugins } from 'griddle-react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import urlParse from 'url-parse';
+
 import Layout from '../../hoc/Layout/Layout';
+import {
+    fetchObjects,
+    clearObjects,
+} from '../../store/actions/objects';
+import InfiniteScrollTable from '../InfiniteScrollTable/InfiniteScrollTable';
 
 class Objects extends Component {
-    data = [
-        {
-            "id": 0,
-            "name": "Mayer Leonard",
-            "city": "Kapowsin",
-            "state": "Hawaii",
-            "country": "United Kingdom",
-            "company": "Ovolo",
-            "favoriteNumber": 7
-        },
-        {
-            "id": 1,
-            "name": "Koch Becker",
-            "city": "Johnsonburg",
-            "state": "New Jersey",
-            "country": "Madagascar",
-            "company": "Eventage",
-            "favoriteNumber": 2
-        },
-        {
-            "id": 2,
-            "name": "Lowery Hopkins",
-            "city": "Blanco",
-            "state": "Arizona",
-            "country": "Ukraine",
-            "company": "Comtext",
-            "favoriteNumber": 3
-        },
-        {
-            "id": 3,
-            "name": "Walters Mays",
-            "city": "Glendale",
-            "state": "Illinois",
-            "country": "New Zealand",
-            "company": "Corporana",
-            "favoriteNumber": 6
-        },
-        {
-            "id": 4,
-            "name": "Shaw Lowe",
-            "city": "Coultervillle",
-            "state": "Wyoming",
-            "country": "Ecuador",
-            "company": "Isologica",
-            "favoriteNumber": 2
-        }
-    ];
+    static propTypes = {
+        fetchObjects: PropTypes.func.isRequired,
+        clearObjects: PropTypes.func.isRequired,
+        hasMore: PropTypes.bool,
+        next: PropTypes.string,
+    }
+
+    componentWillUnmount() {
+        this.props.clearObjects();
+    }
+
+    fetchObjects = () => {
+        const parsed = urlParse(this.props.next);
+        const params = urlParse.qs.parse(parsed.query);
+        this.props.fetchObjects(params);
+    }
 
     render() {
         return (
             <Layout>
-                Objects
-                <Griddle
-                    data={this.data}
-                    plugins={[plugins.PositionPlugin]}
+                <h1>Objects</h1>
+                <InfiniteScrollTable
+                    columns={{
+                        code: {
+                            header: 'Code',
+                            field: 'obj_code',
+                        },
+                        description: {
+                            header: 'Description',
+                            field: 'obj_desc',
+                            width: 300,
+                        },
+                    }}
+                    data={this.props.objects}
+                    hasMore={this.props.hasMore}
+                    loadMore={() => this.fetchObjects()}
                 />
             </Layout>
         );
     }
 }
 
-export default Objects;
+const mapStateToProps = (state) => {
+    return {
+        objects: state.objects.data,
+        hasMore: state.objects.hasMore,
+        next: state.objects.next,
+    };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchObjects: (params) => dispatch(fetchObjects(params)),
+        clearObjects: () => dispatch(clearObjects()),
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Objects);
