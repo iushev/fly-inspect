@@ -2,7 +2,8 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'pgsql:host=db;dbname=flyinspect',
+    // 'dsn' => 'pgsql:host=db;dbname=flyinspect',
+    'dsn' => 'pgsql:host=127.0.0.1;dbname=flyinspect',
     'username' => 'flyinspect',
     'password' => 'fly@inspect',
     'charset' => 'utf8',

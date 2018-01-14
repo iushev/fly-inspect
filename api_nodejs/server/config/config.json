@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "flyinspect",
+    "password": "fly@inspect",
+    "database": "flyinspect",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "flyinspect",
+    "password": "fly@inspect",
+    "database": "flyinspect",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "flyinspect",
+    "password": "fly@inspect",
+    "database": "flyinspect",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres"
+  }
+}

@@ -7,6 +7,9 @@ from flyinspect_api.serializers.EventSerializer import EventSerializer
 
 class EventViewSet(viewsets.ModelViewSet):
     serializer_class = EventSerializer
-    queryset = Event.objects.all()
-    # pagination_class = pagination.CursorPagination
+    # queryset = Event.objects.all()
+    pagination_class = None
     # filter_class = R5EventsFilter
+
+    def get_queryset(self):
+        return Event.objects.all()[:20]

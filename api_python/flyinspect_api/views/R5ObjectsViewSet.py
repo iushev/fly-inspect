@@ -13,8 +13,10 @@ from flyinspect_api.serializers.R5ObjectSerializer import R5ObjectsSerializer
 
 class R5ObjectsViewSet(viewsets.ModelViewSet):
     serializer_class = R5ObjectsSerializer
-    queryset = R5Objects.objects.all()
+    # queryset = R5Objects.objects.all()
+    pagination_class = None
     # filter_class = R5ObjectsFilter
 
+
     def get_queryset(self):
-        return super(R5ObjectsViewSet, self).get_queryset()
+        return R5Objects.objects.all()[:20]
